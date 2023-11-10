@@ -4,11 +4,13 @@ import 'constants/constants.dart';
 
 class BottomBarPainter extends CustomPainter {
   BottomBarPainter({
-    required this.position,
+    required this.horizontalPosition,
     required this.color,
     required this.showShadow,
     required this.notchColor,
     this.notchBorderColor,
+    required this.height,
+    required this.margin,
   })  : _paint = Paint()
           ..color = color
           ..isAntiAlias = true,
@@ -18,7 +20,7 @@ class BottomBarPainter extends CustomPainter {
           ..isAntiAlias = true;
 
   /// position
-  final double position;
+  final double horizontalPosition;
 
   /// Color for the bottom bar
   final Color color;
@@ -41,6 +43,12 @@ class BottomBarPainter extends CustomPainter {
   /// Color for the notch border
   final Color? notchBorderColor;
 
+  final double margin;
+
+  final double height;
+
+  static const heightOffset = 36.0;
+
   @override
   void paint(Canvas canvas, Size size) {
     _drawBar(canvas, size);
@@ -49,19 +57,20 @@ class BottomBarPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(BottomBarPainter oldDelegate) {
-    return position != oldDelegate.position || color != oldDelegate.color;
+    return horizontalPosition != oldDelegate.horizontalPosition ||
+        color != oldDelegate.color;
   }
 
   /// draw bottom bar
   void _drawBar(Canvas canvas, Size size) {
-    final double left = kMargin;
-    final double right = size.width - kMargin;
-    final double top = kMargin;
-    final double bottom = top + kHeight;
+    final double left = margin;
+    final double right = size.width - margin;
+    final double top = margin;
+    final double bottom = top + height;
 
     final path = Path()
       ..moveTo(left + kTopRadius, top)
-      ..lineTo(position - kTopRadius, top)
+      ..lineTo(horizontalPosition - kTopRadius, top + 0)
       ..relativeArcToPoint(
         const Offset(kTopRadius, kTopRadius),
         radius: const Radius.circular(kTopRadius),
@@ -107,8 +116,8 @@ class BottomBarPainter extends CustomPainter {
       ..addArc(
         Rect.fromCircle(
           center: Offset(
-            position + kCircleMargin + kCircleRadius,
-            kMargin + kCircleMargin,
+            horizontalPosition + kCircleMargin + kCircleRadius,
+            margin + kCircleMargin + heightOffset,
           ),
           radius: kCircleRadius,
         ),
