@@ -85,6 +85,13 @@ class AnimatedNotchBottomBar extends StatefulWidget {
 
 class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
     with SingleTickerProviderStateMixin {
+  /// margin
+  double margin = 14.0;
+
+  /// bottom bar height
+// double kHeight = 62.0;
+  double kHeight = 92.0;
+
   late double _screenWidth;
   int maxCount = 5;
   int currentIndex = 0;
@@ -104,8 +111,8 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
     _animationController = AnimationController(
         vsync: this,
         duration: Duration(milliseconds: widget.durationInMilliSeconds));
-    kHeight = widget.removeMargins ? 72.0 : 62.0;
-    kMargin = widget.removeMargins ? 0 : 14.0;
+    kHeight = widget.removeMargins ? 72.0 : kHeight;
+    margin = widget.removeMargins ? 0 : 14.0;
     widget.notchBottomBarController.addListener(() {
       _animationController.reset();
       _animationController.forward();
@@ -131,7 +138,7 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
       throw Exception(
           ' Initial page index cannot be higher than bottom bar items length');
     }
-    final double height = kHeight + kMargin * 2;
+    final double height = kHeight + margin * 2;
 
     return widget.bottomBarItems.length > maxCount
         ? Container()
@@ -183,12 +190,16 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                                 CustomPaint(
                                   size: Size(_screenWidth, height),
                                   painter: BottomBarPainter(
-                                    position: _itemPosByScrollPosition(
-                                        scrollPosition),
+                                    horizontalPosition:
+                                        _itemPosByScrollPosition(
+                                      scrollPosition,
+                                    ),
                                     color: widget.color,
                                     showShadow: widget.showShadow,
                                     notchColor: widget.notchColor,
                                     notchBorderColor: widget.notchBorderColor,
+                                    height: kHeight,
+                                    margin: margin,
                                   ),
                                 ),
                               ],
@@ -216,7 +227,7 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                             ),
                           if (i != currentIndex)
                             Positioned(
-                              top: kMargin + (kHeight - kCircleRadius * 2) / 2,
+                              top: margin + (kHeight - kCircleRadius * 2) / 2,
                               left: kCircleMargin + _itemPosByIndex(i),
                               child: BottomBarInActiveItem(i,
                                   itemWidget:
@@ -241,12 +252,12 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
   }
 
   double _firstItemPosition(double spaceParameter) {
-    return (_screenWidth - kMargin * 2) * spaceParameter;
+    return (_screenWidth - margin * 2) * spaceParameter;
   }
 
   double _lastItemPosition(double spaceParameter) {
     return _screenWidth -
-        (_screenWidth - kMargin * 2) * spaceParameter -
+        (_screenWidth - margin * 2) * spaceParameter -
         (kCircleRadius + kCircleMargin) * 2;
   }
 
