@@ -85,7 +85,7 @@ class BottomBarPainter extends CustomPainter {
     final double right = size.width - margin;
     final double top = margin;
     //We need this +3 adjustment to make the bottom bar look good, without it the bottom bar looks a bit off
-    final double bottom = top + height + 3;
+    final double bottom = top + height;
 
     final sidesHeightDecaynment = size.height * .35;
 
@@ -107,47 +107,6 @@ class BottomBarPainter extends CustomPainter {
     final bottomLeft = Offset(left, bottom);
     final topRight = Offset(right, top + lastItemDecaynment);
     final bottomRight = Offset(right, bottom);
-
-    final path = Path()
-      ..moveTo(left + kTopRadius, top)
-      ..lineTo(horizontalPosition - kTopRadius, top)
-      ..relativeArcToPoint(
-        const Offset(kTopRadius, kTopRadius),
-        radius: const Radius.circular(kTopRadius),
-      )
-      ..relativeArcToPoint(
-        const Offset((kCircleRadius + kCircleMargin) * 2, 0.0),
-        radius: const Radius.circular(kCircleRadius + kCircleMargin),
-        clockwise: false,
-      )
-      ..relativeArcToPoint(
-        const Offset(kTopRadius, -kTopRadius),
-        radius: const Radius.circular(kTopRadius),
-      )
-      ..lineTo(right - kTopRadius, top)
-      ..relativeArcToPoint(
-        const Offset(kTopRadius, kTopRadius),
-        radius: const Radius.circular(kTopRadius),
-      )
-      ..lineTo(right, bottom - kBottomRadius)
-      ..relativeArcToPoint(
-        const Offset(-kBottomRadius, kBottomRadius),
-        radius: const Radius.circular(kBottomRadius),
-      )
-      ..lineTo(left + kBottomRadius, bottom)
-      ..relativeArcToPoint(
-        const Offset(-kBottomRadius, -kBottomRadius),
-        radius: const Radius.circular(kBottomRadius),
-      )
-      ..lineTo(left, top + kTopRadius)
-      ..relativeArcToPoint(
-        const Offset(kTopRadius, -kTopRadius),
-        radius: const Radius.circular(kTopRadius),
-      );
-    if (this.showShadow) {
-      canvas..drawShadow(path, _shadowColor, 5.0, true);
-    }
-    canvas.drawPath(path, _paint);
 
     final rectLeft = (horizontalPosition + (kCircleMargin + kCircleRadius) * 2)
         .roundToDouble();
@@ -182,20 +141,12 @@ class BottomBarPainter extends CustomPainter {
         ..style = PaintingStyle.stroke
         ..strokeWidth = 1,
     );
-    canvas.drawCircle(
-      Offset(horizontalPosition + circleRadius * 2, top),
-      2,
-      Paint()..color = Colors.amber,
-    );
 
-    // canvas.drawLine(
-    //   bottomLeft,
-    //   bottomRight,
-    //   Paint()
-    //     ..color = Colors.green
-    //     ..style = PaintingStyle.stroke
-    //     ..strokeWidth = 2,
-    // );
+    final path = Path();
+    if (this.showShadow) {
+      canvas..drawShadow(path, _shadowColor, 5.0, true);
+    }
+    canvas.drawPath(path, _paint);
   }
 
   /// Function used to draw the circular indicator

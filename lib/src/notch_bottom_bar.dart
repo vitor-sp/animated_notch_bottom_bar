@@ -172,11 +172,11 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (_, __) {
-                final record = getScrollPositionAndCurrentIndex();
+                final (scrollPosition, currentIndex) =
+                    getScrollPositionAndCurrentIndex();
 
-                final horizontalPosition = _itemPosByScrollPosition(
-                  record.scrollPosition,
-                );
+                final horizontalPosition =
+                    _itemPosByScrollPosition(scrollPosition);
                 final overallAnimationPercentage =
                     currentOverallAnimationPercentage(horizontalPosition);
 
@@ -224,7 +224,7 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                         for (var i = 0;
                             i < widget.bottomBarItems.length;
                             i++) ...[
-                          if (i == record.currentIndex &&
+                          if (i == currentIndex &&
                               (_animationController.value == 1.0 || _isInitial))
                             Positioned(
                               top: widget.removeMargins
@@ -236,11 +236,11 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                               child: BottomBarActiveItem(
                                 i,
                                 itemWidget: widget.bottomBarItems[i].activeItem,
-                                scrollPosition: record.scrollPosition,
+                                scrollPosition: scrollPosition,
                                 onTap: widget.onTap,
                               ),
                             ),
-                          if (i != record.currentIndex)
+                          if (i != currentIndex)
                             Positioned(
                               top: margin + (kHeight - kCircleRadius * 2) / 2,
                               left: kCircleMargin + _itemPosByIndex(i),
@@ -297,16 +297,13 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
     final lastPosition = _lastItemPosition(widget.removeMargins ? 0.05 : 0.1);
     final distance = lastPosition - firstPosition;
 
-    final r = getScrollPositionAndCurrentIndex();
-
     final b = horizontalPosition - firstPosition;
 
     final percentage = b / distance;
     return percentage;
   }
 
-  ({double scrollPosition, int? currentIndex})
-      getScrollPositionAndCurrentIndex() {
+  (double, int?) getScrollPositionAndCurrentIndex() {
     ///to set any initial page
     double scrollPosition = widget.notchBottomBarController.index.toDouble();
     int? currentIndex = widget.notchBottomBarController.index;
@@ -323,6 +320,6 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
       currentIndex = widget.notchBottomBarController.index;
     }
 
-    return (scrollPosition: scrollPosition, currentIndex: currentIndex);
+    return (scrollPosition, currentIndex);
   }
 }
