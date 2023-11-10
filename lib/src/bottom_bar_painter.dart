@@ -16,6 +16,7 @@ class BottomBarPainter extends CustomPainter {
     required this.margin,
     required this.animation,
     required this.itemAnimationType,
+    required this.overallAnimationPercentage,
   })  : _paint = Paint()
           ..color = color
           ..isAntiAlias = true,
@@ -58,6 +59,8 @@ class BottomBarPainter extends CustomPainter {
 
   final Animation<double> animation;
 
+  final double overallAnimationPercentage;
+
   final ItemAnimationType itemAnimationType;
 
   @override
@@ -84,16 +87,20 @@ class BottomBarPainter extends CustomPainter {
     //We need this +3 adjustment to make the bottom bar look good, without it the bottom bar looks a bit off
     final double bottom = top + height + 3;
 
+    final sidesHeightDecaynment = size.height * .35;
+
     double firstItemDecaynment = 0.0;
 
-    if (itemAnimationType == ItemAnimationType.showingFirst) {
-      firstItemDecaynment = animation.value * (size.height * .35);
+    if (overallAnimationPercentage < .33) {
+      firstItemDecaynment =
+          sidesHeightDecaynment * (1 - (overallAnimationPercentage / .33));
     }
 
     double lastItemDecaynment = 0.0;
 
-    if (itemAnimationType == ItemAnimationType.showingLast) {
-      lastItemDecaynment = animation.value * (size.height * .35);
+    if (overallAnimationPercentage > .66) {
+      lastItemDecaynment =
+          sidesHeightDecaynment * ((overallAnimationPercentage - .66) / .33);
     }
 
     final topLeft = Offset(left, top + firstItemDecaynment);

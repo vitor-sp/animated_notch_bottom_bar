@@ -96,11 +96,11 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
 
   late double _screenWidth;
   static int maxCount = 5;
-  int currentIndex = 0;
   late final AnimationController _animationController;
   bool _isInitial = true;
 
   late ItemAnimationType itemAnimationType;
+
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -172,24 +172,13 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
             child: AnimatedBuilder(
               animation: _animationController,
               builder: (_, __) {
-                ///to set any initial page
-                double scrollPosition =
-                    widget.notchBottomBarController.index.toDouble();
-                int? currentIndex = widget.notchBottomBarController.index;
-                if (widget.notchBottomBarController.oldIndex != null) {
-                  _isInitial = false;
-                  scrollPosition = Tween<double>(
-                          begin: widget.notchBottomBarController.oldIndex!
-                              .toDouble(),
-                          end: widget.notchBottomBarController.index.toDouble())
-                      // ignore: invalid_use_of_protected_member
-                      .lerp(_animationController.value);
-                  currentIndex = widget.notchBottomBarController.index;
-                } else {
-                  scrollPosition =
-                      widget.notchBottomBarController.index.toDouble();
-                  currentIndex = widget.notchBottomBarController.index;
-                }
+                final record = getScrollPositionAndCurrentIndex();
+
+                final horizontalPosition = _itemPosByScrollPosition(
+                  record.scrollPosition,
+                );
+                final overallAnimationPercentage =
+                    currentOverallAnimationPercentage(horizontalPosition);
 
                 return ClipRRect(
                   child: Padding(
@@ -215,10 +204,9 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                                 CustomPaint(
                                   size: Size(_screenWidth, height),
                                   painter: BottomBarPainter(
-                                    horizontalPosition:
-                                        _itemPosByScrollPosition(
-                                      scrollPosition,
-                                    ),
+                                    overallAnimationPercentage:
+                                        overallAnimationPercentage,
+                                    horizontalPosition: horizontalPosition,
                                     color: widget.color,
                                     showShadow: widget.showShadow,
                                     notchColor: widget.notchColor,
@@ -236,7 +224,7 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                         for (var i = 0;
                             i < widget.bottomBarItems.length;
                             i++) ...[
-                          if (i == currentIndex &&
+                          if (i == record.currentIndex &&
                               (_animationController.value == 1.0 || _isInitial))
                             Positioned(
                               top: widget.removeMargins
@@ -244,19 +232,19 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                                   : kTopMargin,
                               left: kCircleRadius -
                                   kCircleMargin / 2 +
-                                  _itemPosByScrollPosition(scrollPosition),
+                                  horizontalPosition,
                               child: BottomBarActiveItem(
                                 i,
                                 itemWidget: widget.bottomBarItems[i].activeItem,
-                                scrollPosition: scrollPosition,
+                                scrollPosition: record.scrollPosition,
                                 onTap: widget.onTap,
                               ),
                             ),
-                          if (i != currentIndex)
+                          if (i != record.currentIndex)
                             Positioned(
                               top: margin + (kHeight - kCircleRadius * 2) / 2,
                               left: kCircleMargin + _itemPosByIndex(i),
-                              child: BottomBarInActiveItem(i,
+                              child: BottomBarInactiveItem(i,
                                   itemWidget:
                                       widget.bottomBarItems[i].inActiveItem,
                                   label: widget.bottomBarItems[i].itemLabel,
@@ -302,5 +290,39 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
   double _itemPosByIndex(int index) {
     return _firstItemPosition(widget.removeMargins ? 0.05 : 0.1) +
         _itemDistance() * index;
+  }
+
+  double currentOverallAnimationPercentage(double horizontalPosition) {
+    final firstPosition = _firstItemPosition(widget.removeMargins ? 0.05 : 0.1);
+    final lastPosition = _lastItemPosition(widget.removeMargins ? 0.05 : 0.1);
+    final distance = lastPosition - firstPosition;
+
+    final r = getScrollPositionAndCurrentIndex();
+
+    final b = horizontalPosition - firstPosition;
+
+    final percentage = b / distance;
+    return percentage;
+  }
+
+  ({double scrollPosition, int? currentIndex})
+      getScrollPositionAndCurrentIndex() {
+    ///to set any initial page
+    double scrollPosition = widget.notchBottomBarController.index.toDouble();
+    int? currentIndex = widget.notchBottomBarController.index;
+    if (widget.notchBottomBarController.oldIndex != null) {
+      _isInitial = false;
+      scrollPosition = Tween<double>(
+              begin: widget.notchBottomBarController.oldIndex!.toDouble(),
+              end: widget.notchBottomBarController.index.toDouble())
+          // ignore: invalid_use_of_protected_member
+          .lerp(_animationController.value);
+      currentIndex = widget.notchBottomBarController.index;
+    } else {
+      scrollPosition = widget.notchBottomBarController.index.toDouble();
+      currentIndex = widget.notchBottomBarController.index;
+    }
+
+    return (scrollPosition: scrollPosition, currentIndex: currentIndex);
   }
 }
