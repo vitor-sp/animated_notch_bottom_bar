@@ -137,10 +137,12 @@ class BottomBarPainter extends CustomPainter {
       ..moveTo(bottomLeft.dx, bottomLeft.dy)
       ..lineTo(bottomRight.dx, bottomRight.dy)
       ..lineTo(topRight.dx, topRight.dy)
+      //Concave curve where the notch is
       ..lineTo(rectTopRight.dx, rectTopRight.dy)
       ..lineTo(rectBottomRight.dx, rectBottomRight.dy)
       ..lineTo(rectBottomLeft.dx, rectBottomLeft.dy)
       ..lineTo(rectTopLeft.dx, rectTopLeft.dy)
+      //End of concave curve
       ..lineTo(topLeft.dx, topLeft.dy)
       ..lineTo(bottomLeft.dx, bottomLeft.dy);
     if (this.showShadow) {
