@@ -47,6 +47,9 @@ class AnimatedNotchBottomBar extends StatefulWidget {
   /// Color of bottom bar
   final Color notchColor;
 
+  /// Colors of the notch border
+  final Color? notchBorderColor;
+
   /// Duration in milliseconds for animation
   final int durationInMilliSeconds;
 
@@ -73,13 +76,15 @@ class AnimatedNotchBottomBar extends StatefulWidget {
     this.durationInMilliSeconds = 300,
     this.bottomBarWidth = 500,
     this.removeMargins = false,
+    this.notchBorderColor,
   }) : super(key: key);
 
   @override
   _AnimatedNotchBottomBarState createState() => _AnimatedNotchBottomBarState();
 }
 
-class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with SingleTickerProviderStateMixin {
+class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
+    with SingleTickerProviderStateMixin {
   late double _screenWidth;
   int maxCount = 5;
   int currentIndex = 0;
@@ -88,14 +93,17 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _screenWidth = MediaQuery.of(context).size.width <= 500 ? MediaQuery.of(context).size.width : widget.bottomBarWidth;
+    _screenWidth = MediaQuery.of(context).size.width <= 500
+        ? MediaQuery.of(context).size.width
+        : widget.bottomBarWidth;
   }
 
   @override
   void initState() {
     super.initState();
-    _animationController =
-        AnimationController(vsync: this, duration: Duration(milliseconds: widget.durationInMilliSeconds));
+    _animationController = AnimationController(
+        vsync: this,
+        duration: Duration(milliseconds: widget.durationInMilliSeconds));
     kHeight = widget.removeMargins ? 72.0 : 62.0;
     kMargin = widget.removeMargins ? 0 : 14.0;
     widget.notchBottomBarController.addListener(() {
@@ -118,8 +126,10 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
     }
 
     /// uncomment
-    if (widget.notchBottomBarController.index > widget.bottomBarItems.length - 1) {
-      throw Exception(' Initial page index cannot be higher than bottom bar items length');
+    if (widget.notchBottomBarController.index >
+        widget.bottomBarItems.length - 1) {
+      throw Exception(
+          ' Initial page index cannot be higher than bottom bar items length');
     }
     final double height = kHeight + kMargin * 2;
 
@@ -129,51 +139,74 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
             alignment: Alignment.bottomCenter,
             child: AnimatedBuilder(
               animation: _animationController,
-              builder: (BuildContext _, Widget? __) {
+              builder: (_, __) {
                 ///to set any initial page
-                double scrollPosition = widget.notchBottomBarController.index.toDouble();
+                double scrollPosition =
+                    widget.notchBottomBarController.index.toDouble();
                 int? currentIndex = widget.notchBottomBarController.index;
                 if (widget.notchBottomBarController.oldIndex != null) {
                   _isInitial = false;
                   scrollPosition = Tween<double>(
-                          begin: widget.notchBottomBarController.oldIndex!.toDouble(),
+                          begin: widget.notchBottomBarController.oldIndex!
+                              .toDouble(),
                           end: widget.notchBottomBarController.index.toDouble())
                       // ignore: invalid_use_of_protected_member
                       .lerp(_animationController.value);
                   currentIndex = widget.notchBottomBarController.index;
                 } else {
-                  scrollPosition = widget.notchBottomBarController.index.toDouble();
+                  scrollPosition =
+                      widget.notchBottomBarController.index.toDouble();
                   currentIndex = widget.notchBottomBarController.index;
                 }
 
                 return ClipRRect(
                   child: Padding(
-                    padding: EdgeInsets.only(top: widget.removeMargins ? 22.0 : 8),
+                    padding: EdgeInsets.only(top: 22.0),
                     child: Stack(
                       clipBehavior: Clip.none,
                       children: <Widget>[
                         BackdropFilter(
                           filter: ImageFilter.blur(
-                            sigmaX: widget.showBlurBottomBar ? widget.blurFilterX : 0.0,
-                            sigmaY: widget.showBlurBottomBar ? widget.blurFilterY : 0.0,
+                            sigmaX: widget.showBlurBottomBar
+                                ? widget.blurFilterX
+                                : 0.0,
+                            sigmaY: widget.showBlurBottomBar
+                                ? widget.blurFilterY
+                                : 0.0,
                           ),
                           child: Opacity(
-                            opacity: widget.showBlurBottomBar ? widget.blurOpacity : 1,
-                            child: CustomPaint(
-                              size: Size(_screenWidth, height),
-                              painter: BottomBarPainter(
-                                  position: _itemPosByScrollPosition(scrollPosition),
-                                  color: widget.color,
-                                  showShadow: widget.showShadow,
-                                  notchColor: widget.notchColor),
+                            opacity: widget.showBlurBottomBar
+                                ? widget.blurOpacity
+                                : 1,
+                            child: Stack(
+                              children: [
+                                CustomPaint(
+                                  size: Size(_screenWidth, height),
+                                  painter: BottomBarPainter(
+                                    position: _itemPosByScrollPosition(
+                                        scrollPosition),
+                                    color: widget.color,
+                                    showShadow: widget.showShadow,
+                                    notchColor: widget.notchColor,
+                                    notchBorderColor: widget.notchBorderColor,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
-                        for (var i = 0; i < widget.bottomBarItems.length; i++) ...[
-                          if (i == currentIndex && (_animationController.value == 1.0 || _isInitial))
+                        for (var i = 0;
+                            i < widget.bottomBarItems.length;
+                            i++) ...[
+                          if (i == currentIndex &&
+                              (_animationController.value == 1.0 || _isInitial))
                             Positioned(
-                              top: widget.removeMargins ? -kCircleMargin / 2 : kTopMargin,
-                              left: kCircleRadius - kCircleMargin / 2 + _itemPosByScrollPosition(scrollPosition),
+                              top: widget.removeMargins
+                                  ? -kCircleMargin / 2
+                                  : kTopMargin,
+                              left: kCircleRadius -
+                                  kCircleMargin / 2 +
+                                  _itemPosByScrollPosition(scrollPosition),
                               child: BottomBarActiveItem(
                                 i,
                                 itemWidget: widget.bottomBarItems[i].activeItem,
@@ -186,11 +219,16 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
                               top: kMargin + (kHeight - kCircleRadius * 2) / 2,
                               left: kCircleMargin + _itemPosByIndex(i),
                               child: BottomBarInActiveItem(i,
-                                  itemWidget: widget.bottomBarItems[i].inActiveItem,
-                                  label: widget.bottomBarItems[i].itemLabel, onTap: (selectedIndex) {
-                                widget.notchBottomBarController.jumpTo(selectedIndex);
+                                  itemWidget:
+                                      widget.bottomBarItems[i].inActiveItem,
+                                  label: widget.bottomBarItems[i].itemLabel,
+                                  onTap: (selectedIndex) {
+                                widget.notchBottomBarController
+                                    .jumpTo(selectedIndex);
                                 widget.onTap.call(selectedIndex);
-                              }, showLabel: widget.showLabel, labelStyle: widget.itemLabelStyle),
+                              },
+                                  showLabel: widget.showLabel,
+                                  labelStyle: widget.itemLabelStyle),
                             ),
                         ],
                       ],
@@ -207,7 +245,9 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
   }
 
   double _lastItemPosition(double spaceParameter) {
-    return _screenWidth - (_screenWidth - kMargin * 2) * spaceParameter - (kCircleRadius + kCircleMargin) * 2;
+    return _screenWidth -
+        (_screenWidth - kMargin * 2) * spaceParameter -
+        (kCircleRadius + kCircleMargin) * 2;
   }
 
   double _itemDistance() {
@@ -217,10 +257,12 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar> with Si
   }
 
   double _itemPosByScrollPosition(double scrollPosition) {
-    return _firstItemPosition(widget.removeMargins ? 0.05 : 0.1) + _itemDistance() * scrollPosition;
+    return _firstItemPosition(widget.removeMargins ? 0.05 : 0.1) +
+        _itemDistance() * scrollPosition;
   }
 
   double _itemPosByIndex(int index) {
-    return _firstItemPosition(widget.removeMargins ? 0.05 : 0.1) + _itemDistance() * index;
+    return _firstItemPosition(widget.removeMargins ? 0.05 : 0.1) +
+        _itemDistance() * index;
   }
 }

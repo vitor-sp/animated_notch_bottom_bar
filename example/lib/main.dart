@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
   /// Controller to handle bottom nav bar and also handles initial page
   final _controller = NotchBottomBarController(index: 0);
 
-  int maxCount = 5;
+  int maxCount = 3;
 
   @override
   void dispose() {
@@ -49,8 +49,6 @@ class _MyHomePageState extends State<MyHomePage> {
     const Page1(),
     const Page2(),
     const Page3(),
-    const Page4(),
-    const Page5(),
   ];
 
   @override
@@ -70,6 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.white,
               showLabel: false,
               notchColor: Colors.black87,
+              notchBorderColor: Colors.red,
 
               /// restart app if you change removeMargins
               removeMargins: false,
@@ -98,40 +97,25 @@ class _MyHomePageState extends State<MyHomePage> {
                   ),
                   itemLabel: 'Page 2',
                 ),
-
-                ///svg example
                 BottomBarItem(
                   inActiveItem: SvgPicture.asset(
                     'assets/search_icon.svg',
                     color: Colors.blueGrey,
                   ),
-                  activeItem: SvgPicture.asset(
-                    'assets/search_icon.svg',
-                    color: Colors.white,
+                  activeItem: DecoratedBox(
+                    decoration: const BoxDecoration(
+                      color: Colors.green,
+                      shape: BoxShape.circle,
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: SvgPicture.asset(
+                        'assets/search_icon.svg',
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                   itemLabel: 'Page 3',
-                ),
-                const BottomBarItem(
-                  inActiveItem: Icon(
-                    Icons.settings,
-                    color: Colors.blueGrey,
-                  ),
-                  activeItem: Icon(
-                    Icons.settings,
-                    color: Colors.pink,
-                  ),
-                  itemLabel: 'Page 4',
-                ),
-                const BottomBarItem(
-                  inActiveItem: Icon(
-                    Icons.person,
-                    color: Colors.blueGrey,
-                  ),
-                  activeItem: Icon(
-                    Icons.person,
-                    color: Colors.yellow,
-                  ),
-                  itemLabel: 'Page 5',
                 ),
               ],
               onTap: (index) {
@@ -151,7 +135,11 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.yellow, child: const Center(child: Text('Page 1')));
+      color: Colors.yellow,
+      child: const Center(
+        child: Text('Page 1'),
+      ),
+    );
   }
 }
 
@@ -161,7 +149,9 @@ class Page2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.green, child: const Center(child: Text('Page 2')));
+      color: Colors.green,
+      child: const Center(child: Text('Page 2')),
+    );
   }
 }
 

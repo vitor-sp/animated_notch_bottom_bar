@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'constants/constants.dart';
 
 class BottomBarPainter extends CustomPainter {
-  BottomBarPainter(
-      {required this.position,
-      required this.color,
-      required this.showShadow,
-      required this.notchColor})
-      : _paint = Paint()
+  BottomBarPainter({
+    required this.position,
+    required this.color,
+    required this.showShadow,
+    required this.notchColor,
+    this.notchBorderColor,
+  })  : _paint = Paint()
           ..color = color
           ..isAntiAlias = true,
         _shadowColor = Colors.grey.shade600,
@@ -36,6 +37,9 @@ class BottomBarPainter extends CustomPainter {
 
   /// Color for the notch
   final Color notchColor;
+
+  /// Color for the notch border
+  final Color? notchBorderColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -115,5 +119,14 @@ class BottomBarPainter extends CustomPainter {
       canvas..drawShadow(path, _shadowColor, 5.0, true);
     }
     canvas.drawPath(path, _notchPaint);
+
+    if (notchBorderColor != null) {
+      final borderPaint = _notchPaint
+        ..color = notchBorderColor!
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 2.0
+        ..isAntiAlias = true;
+      canvas.drawPath(path, borderPaint);
+    }
   }
 }
