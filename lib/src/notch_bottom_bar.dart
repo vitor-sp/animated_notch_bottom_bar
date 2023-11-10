@@ -9,6 +9,8 @@ import 'constants/constants.dart';
 import 'models/bottom_bar_item_model.dart';
 import 'notch_bottom_bar_controller.dart';
 
+enum ItemAnimationType { showingFirst, middle, showingLast }
+
 /// Class to generate the NotchBottomBar
 class AnimatedNotchBottomBar extends StatefulWidget {
   /// Controller for animation
@@ -93,10 +95,12 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
   double kHeight = 92.0;
 
   late double _screenWidth;
-  int maxCount = 5;
+  static int maxCount = 5;
   int currentIndex = 0;
   late final AnimationController _animationController;
   bool _isInitial = true;
+
+  late ItemAnimationType itemAnimationType;
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
@@ -109,14 +113,35 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
   void initState() {
     super.initState();
     _animationController = AnimationController(
-        vsync: this,
-        duration: Duration(milliseconds: widget.durationInMilliSeconds));
+      vsync: this,
+      duration: Duration(milliseconds: widget.durationInMilliSeconds),
+    );
+
+    updateItemAnimationType();
     kHeight = widget.removeMargins ? 72.0 : kHeight;
     margin = widget.removeMargins ? 0 : 14.0;
     widget.notchBottomBarController.addListener(() {
       _animationController.reset();
       _animationController.forward();
     });
+
+    _animationController.addListener(updateItemAnimationType);
+  }
+
+  void updateItemAnimationType() {
+    final currentIndex = widget.notchBottomBarController.index;
+
+    final lastIndex = widget.bottomBarItems.length > maxCount
+        ? maxCount - 1
+        : widget.bottomBarItems.length - 1;
+
+    if (currentIndex == 0) {
+      itemAnimationType = ItemAnimationType.showingFirst;
+    } else if (currentIndex == lastIndex) {
+      itemAnimationType = ItemAnimationType.showingLast;
+    } else {
+      itemAnimationType = ItemAnimationType.middle;
+    }
   }
 
   @override
@@ -200,6 +225,8 @@ class _AnimatedNotchBottomBarState extends State<AnimatedNotchBottomBar>
                                     notchBorderColor: widget.notchBorderColor,
                                     height: kHeight,
                                     margin: margin,
+                                    animation: _animationController,
+                                    itemAnimationType: itemAnimationType,
                                   ),
                                 ),
                               ],

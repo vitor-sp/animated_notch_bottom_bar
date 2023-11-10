@@ -1,3 +1,6 @@
+import 'dart:ui';
+
+import 'package:animated_notch_bottom_bar/animated_notch_bottom_bar/animated_notch_bottom_bar.dart';
 import 'package:flutter/material.dart';
 
 import 'constants/constants.dart';
@@ -11,6 +14,8 @@ class BottomBarPainter extends CustomPainter {
     this.notchBorderColor,
     required this.height,
     required this.margin,
+    required this.animation,
+    required this.itemAnimationType,
   })  : _paint = Paint()
           ..color = color
           ..isAntiAlias = true,
@@ -51,10 +56,18 @@ class BottomBarPainter extends CustomPainter {
 
   static const borderWidth = 1.0;
 
+  final Animation<double> animation;
+
+  final ItemAnimationType itemAnimationType;
+
   @override
   void paint(Canvas canvas, Size size) {
-    _drawBar(canvas, size);
-    _drawFloatingCircle(canvas);
+    final circleRadius = kCircleRadius -
+        (notchBorderColor != null ? borderWidth : kCircleRadius);
+
+    _drawBar(canvas, size, circleRadius);
+
+    _drawFloatingCircle(canvas, circleRadius);
   }
 
   @override
@@ -64,17 +77,33 @@ class BottomBarPainter extends CustomPainter {
   }
 
   /// draw bottom bar
-  void _drawBar(Canvas canvas, Size size) {
+  void _drawBar(Canvas canvas, Size size, double circleRadius) {
     final double left = margin;
     final double right = size.width - margin;
     final double top = margin;
-    final double bottom = top + height;
-    final a = Offset(left + kBottomRadius, bottom);
-    final b = Offset(-kBottomRadius, -kBottomRadius);
+    //We need this +3 adjustment to make the bottom bar look good, without it the bottom bar looks a bit off
+    final double bottom = top + height + 3;
+
+    double firstItemDecaynment = 0.0;
+
+    if (itemAnimationType == ItemAnimationType.showingFirst) {
+      firstItemDecaynment = animation.value * (size.height * .35);
+    }
+
+    double lastItemDecaynment = 0.0;
+
+    if (itemAnimationType == ItemAnimationType.showingLast) {
+      lastItemDecaynment = animation.value * (size.height * .35);
+    }
+
+    final topLeft = Offset(left, top + firstItemDecaynment);
+    final bottomLeft = Offset(left, bottom);
+    final topRight = Offset(right, top + lastItemDecaynment);
+    final bottomRight = Offset(right, bottom);
 
     final path = Path()
       ..moveTo(left + kTopRadius, top)
-      ..lineTo(horizontalPosition - kTopRadius, top + 0)
+      ..lineTo(horizontalPosition - kTopRadius, top)
       ..relativeArcToPoint(
         const Offset(kTopRadius, kTopRadius),
         radius: const Radius.circular(kTopRadius),
@@ -112,18 +141,58 @@ class BottomBarPainter extends CustomPainter {
       canvas..drawShadow(path, _shadowColor, 5.0, true);
     }
     canvas.drawPath(path, _paint);
-    canvas.drawLine(
-      a,
-      b,
-      Paint()
-        ..color = Colors.red
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 4,
+
+    final rectLeft = (horizontalPosition + (kCircleMargin + kCircleRadius) * 2)
+        .roundToDouble();
+
+    final rectBottom = bottom - 8;
+
+    final rectTopLeft = Offset(horizontalPosition, top + firstItemDecaynment);
+
+    final rectTopRight = Offset(
+      rectLeft,
+      top + lastItemDecaynment,
     );
+
+    final rectBottomLeft = Offset(horizontalPosition, rectBottom);
+    final rectBottomRight = Offset(rectLeft, rectBottom);
+
+    canvas.drawPoints(
+      PointMode.polygon,
+      [
+        topLeft,
+        bottomLeft,
+        bottomRight,
+        topRight,
+        rectTopRight,
+        rectBottomRight,
+        rectBottomLeft,
+        rectTopLeft,
+        topLeft,
+      ],
+      Paint()
+        ..color = Colors.purple.withOpacity(.9)
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1,
+    );
+    canvas.drawCircle(
+      Offset(horizontalPosition + circleRadius * 2, top),
+      2,
+      Paint()..color = Colors.amber,
+    );
+
+    // canvas.drawLine(
+    //   bottomLeft,
+    //   bottomRight,
+    //   Paint()
+    //     ..color = Colors.green
+    //     ..style = PaintingStyle.stroke
+    //     ..strokeWidth = 2,
+    // );
   }
 
   /// Function used to draw the circular indicator
-  void _drawFloatingCircle(Canvas canvas) {
+  void _drawFloatingCircle(Canvas canvas, double circleRadius) {
     final path = Path()
       ..addArc(
         Rect.fromCircle(
@@ -131,8 +200,7 @@ class BottomBarPainter extends CustomPainter {
             horizontalPosition + kCircleMargin + kCircleRadius,
             margin + kCircleMargin + heightOffset,
           ),
-          radius: kCircleRadius -
-              (notchBorderColor != null ? borderWidth : kCircleRadius),
+          radius: circleRadius,
         ),
         0,
         kPi * 2,

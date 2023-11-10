@@ -67,7 +67,7 @@ class _MyHomePageState extends State<MyHomePage> {
               notchBottomBarController: _controller,
               color: Colors.white,
               showLabel: false,
-              notchColor: Colors.black87,
+              notchColor: Colors.black26,
               notchBorderColor: Colors.red,
 
               /// restart app if you change removeMargins
@@ -135,7 +135,7 @@ class Page1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.yellow,
+      color: Colors.yellow.withOpacity(.2),
       child: const Center(
         child: Text('Page 1'),
       ),
@@ -149,7 +149,7 @@ class Page2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Colors.green,
+      color: Colors.green.withOpacity(.2),
       child: const Center(child: Text('Page 2')),
     );
   }
@@ -161,7 +161,9 @@ class Page3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.red, child: const Center(child: Text('Page 3')));
+      color: Colors.red.withOpacity(.2),
+      child: const Center(child: Text('Page 3')),
+    );
   }
 }
 
@@ -171,7 +173,9 @@ class Page4 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-        color: Colors.blue, child: const Center(child: Text('Page 4')));
+      color: Colors.blue.withOpacity(.2),
+      child: const Center(child: Text('Page 4')),
+    );
   }
 }
 
