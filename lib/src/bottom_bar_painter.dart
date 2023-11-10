@@ -123,26 +123,26 @@ class BottomBarPainter extends CustomPainter {
     final rectBottomLeft = Offset(horizontalPosition, rectBottom);
     final rectBottomRight = Offset(rectLeft, rectBottom);
 
-    canvas.drawPoints(
-      PointMode.polygon,
-      [
-        topLeft,
-        bottomLeft,
-        bottomRight,
-        topRight,
-        rectTopRight,
-        rectBottomRight,
-        rectBottomLeft,
-        rectTopLeft,
-        topLeft,
-      ],
-      Paint()
-        ..color = Colors.purple.withOpacity(.9)
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1,
-    );
+    // bottomLeft,
+    // bottomRight,
+    // topRight,
+    // rectTopRight,
+    // rectBottomRight,
+    // rectBottomLeft,
+    // rectTopLeft,
+    // topLeft,
+    // bottomLeft,
 
-    final path = Path();
+    final path = Path()
+      ..moveTo(bottomLeft.dx, bottomLeft.dy)
+      ..lineTo(bottomRight.dx, bottomRight.dy)
+      ..lineTo(topRight.dx, topRight.dy)
+      ..lineTo(rectTopRight.dx, rectTopRight.dy)
+      ..lineTo(rectBottomRight.dx, rectBottomRight.dy)
+      ..lineTo(rectBottomLeft.dx, rectBottomLeft.dy)
+      ..lineTo(rectTopLeft.dx, rectTopLeft.dy)
+      ..lineTo(topLeft.dx, topLeft.dy)
+      ..lineTo(bottomLeft.dx, bottomLeft.dy);
     if (this.showShadow) {
       canvas..drawShadow(path, _shadowColor, 5.0, true);
     }
