@@ -47,7 +47,9 @@ class BottomBarPainter extends CustomPainter {
 
   final double height;
 
-  static const heightOffset = 36.0;
+  static const heightOffset = 32.0;
+
+  static const borderWidth = 1.0;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -67,6 +69,8 @@ class BottomBarPainter extends CustomPainter {
     final double right = size.width - margin;
     final double top = margin;
     final double bottom = top + height;
+    final a = Offset(left + kBottomRadius, bottom);
+    final b = Offset(-kBottomRadius, -kBottomRadius);
 
     final path = Path()
       ..moveTo(left + kTopRadius, top)
@@ -108,6 +112,14 @@ class BottomBarPainter extends CustomPainter {
       canvas..drawShadow(path, _shadowColor, 5.0, true);
     }
     canvas.drawPath(path, _paint);
+    canvas.drawLine(
+      a,
+      b,
+      Paint()
+        ..color = Colors.red
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 4,
+    );
   }
 
   /// Function used to draw the circular indicator
@@ -119,7 +131,8 @@ class BottomBarPainter extends CustomPainter {
             horizontalPosition + kCircleMargin + kCircleRadius,
             margin + kCircleMargin + heightOffset,
           ),
-          radius: kCircleRadius,
+          radius: kCircleRadius -
+              (notchBorderColor != null ? borderWidth : kCircleRadius),
         ),
         0,
         kPi * 2,
@@ -133,7 +146,7 @@ class BottomBarPainter extends CustomPainter {
       final borderPaint = _notchPaint
         ..color = notchBorderColor!
         ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.0
+        ..strokeWidth = borderWidth
         ..isAntiAlias = true;
       canvas.drawPath(path, borderPaint);
     }

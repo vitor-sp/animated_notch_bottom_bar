@@ -4,7 +4,7 @@ const double kCircleRadius = 40.0;
 /// margin between notch and circle
 const double kCircleMargin = 8.0;
 
-const double kTopRadius = 28.0;
+const double kTopRadius = 38.0;
 
 /// top margin
 const double kTopMargin = 10.0;
