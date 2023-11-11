@@ -149,6 +149,21 @@ class BottomBarPainter extends CustomPainter {
       canvas..drawShadow(path, _shadowColor, 5.0, true);
     }
     canvas.drawPath(path, _paint);
+
+    final sideCircleRadius = (bottom - top) / 2;
+
+    final rightPath = Path()
+      ..moveTo(bottomRight.dx - sideCircleRadius, bottomRight.dy)
+      ..arcToPoint(
+        Offset(bottomRight.dx - sideCircleRadius, topRight.dy),
+        radius: Radius.circular(sideCircleRadius),
+        clockwise: false,
+      );
+
+    canvas.drawPath(
+      rightPath,
+      Paint()..color = Colors.purple,
+    );
   }
 
   /// Function used to draw the circular indicator
